@@ -8,21 +8,14 @@ services:
     build:
       context: ./dockerfiles
       dockerfile: nginx.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-root}
-        - GROUP=${GROUP:-root}
     container_name: nginx
     ports:
       - 80:80
     volumes:
-      - ./:/var/www/html:delegated
+      - ./:/var/www/html
     depends_on:
       - php
-      - redis
       - mysql
-      - mailhog
     networks:
       - laravel
 
@@ -43,26 +36,14 @@ services:
     networks:
       - laravel
 
+
   php:
     build:
       context: ./dockerfiles
       dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
     container_name: php
     volumes:
-      - ./:/var/www/html:delegated
-    networks:
-      - laravel
-
-  redis:
-    image: redis:alpine
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - 6379:6379
+      - ./:/var/www/html
     networks:
       - laravel
 
@@ -70,31 +51,13 @@ services:
     build:
       context: ./dockerfiles
       dockerfile: composer.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
     container_name: composer
     volumes:
       - ./:/var/www/html
     working_dir: /var/www/html
     depends_on:
       - php
-    user: ${USER:-youruser}
     entrypoint: ['composer', '--ignore-platform-reqs']
-    networks:
-      - laravel
-
-  npm:
-    image: node:13.7
-    container_name: npm
-    volumes:
-      - ./:/var/www/html
-    ports:
-      - 3000:3000
-      - 3001:3001
-    working_dir: /var/www/html
-    entrypoint: ['npm']
     networks:
       - laravel
 
@@ -102,25 +65,12 @@ services:
     build:
       context: ./dockerfiles
       dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-        - USER=${USER:-youruser}
     container_name: artisan
     volumes:
-      - ./:/var/www/html:delegated
+      - ./:/var/www/html
     depends_on:
       - mysql
     working_dir: /var/www/html
     entrypoint: ['php', '/var/www/html/artisan']
-    networks:
-      - laravel
-
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: mailhog
-    ports:
-      - 1025:1025
-      - 8025:8025
     networks:
       - laravel
