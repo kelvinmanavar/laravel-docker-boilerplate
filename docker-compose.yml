@@ -11,7 +11,8 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-        - USER=${USER:-youruser}
+        - USER=${USER:-root}
+        - GROUP=${GROUP:-root}
     container_name: nginx
     ports:
       - 80:80
